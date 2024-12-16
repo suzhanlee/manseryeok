@@ -38,9 +38,4 @@ out/
 
 ### 초기 세팅 제거
 .gitattributes
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
 
