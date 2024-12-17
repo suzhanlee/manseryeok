@@ -27,7 +27,7 @@ public class ManSeryeok {
     @Embedded
     private Luna luna;
 
-    public static ManSeryeok createCalender(String dayOfWeek, LocalDate solarDate,
+    public static ManSeryeok createCalendar(String dayOfWeek, LocalDate solarDate,
                                             String solarGanJi, String jeolgi,
                                             LocalDate lunarDate, String lunarGanJi) {
         ManSeryeok manSeryeok = new ManSeryeok();

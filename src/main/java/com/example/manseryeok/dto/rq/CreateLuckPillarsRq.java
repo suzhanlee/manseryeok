@@ -13,5 +13,5 @@ public class CreateLuckPillarsRq {
     private String fourPillars;
     private String gender;
     private LocalDate birthDate;
-    private String calenderType;
+    private String calendarType;
 }

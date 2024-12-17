@@ -29,18 +29,19 @@ public enum Ji {
         this.endTime = endTime;
     }
 
-    public static Ji findByHour(int hour) {
-        LocalTime time = LocalTime.of(hour, 0);
+    public static Ji findByTime(LocalTime time) {
         return Arrays.stream(values())
                 .filter(ji -> isTimeInRange(time, ji.startTime, ji.endTime))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다 : " + hour));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다 : " + time));
     }
 
     private static boolean isTimeInRange(LocalTime time, LocalTime start, LocalTime end) {
         if (start.equals(LocalTime.of(23, 0))) {
-            return time.equals(LocalTime.of(0, 0)) || time.isBefore(LocalTime.of(1, 0))
-                    || !time.isBefore(LocalTime.of(23, 0));
+            if (!time.isBefore(LocalTime.of(23, 0))) {
+                return true;
+            }
+            return time.isBefore(LocalTime.of(1, 0));
         }
         return !time.isBefore(start) && time.isBefore(end);
     }

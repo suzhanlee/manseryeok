@@ -13,7 +13,7 @@ public class HourPillar {
     }
 
     public static HourPillar createHourPillar(LocalTime time, String dayGan) {
-        Ji ji = Ji.findByHour(time.getHour());
+        Ji ji = Ji.findByTime(time);
         Gan gan = Gan.findByJiAndDayGan(ji, dayGan);
         return new HourPillar(gan, ji);
     }
