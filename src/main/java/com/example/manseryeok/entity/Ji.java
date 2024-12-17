@@ -51,11 +51,12 @@ public enum Ji {
                 .orElseThrow();
     }
 
-    public static Ji changeJi(Ji startJi, int count, CalendarType calendarType) {
+    public static Ji changeJi(Ji startJi, int count, CalendarType calendarType, String gender) {
         if (count == 0) {
             return startJi;
         }
-        boolean isForward = CalendarType.SOLAR.equals(calendarType);
+        boolean isForward = (CalendarType.SOLAR.equals(calendarType) && "man".equals(gender))
+                || (CalendarType.LUNAR.equals(calendarType) && "woman".equals(gender));
         return startJi.getNextJi(count, isForward);
     }
 
@@ -66,7 +67,11 @@ public enum Ji {
         if (isForward) {
             return values[(currentIndex + count) % values.length];
         } else {
-            return values[(currentIndex - count + values.length * Math.abs(count / values.length)) % values.length];
+            int newIndex = (currentIndex - count) % values.length;
+            if (newIndex < 0) {
+                newIndex += values.length;
+            }
+            return values[newIndex];
         }
     }
 }

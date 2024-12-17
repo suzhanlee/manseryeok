@@ -194,7 +194,7 @@ public class ManSeryeokService {
     public CreateLuckPillarsRs calculateLuckPillars(CreateLuckPillarsRq rq) {
         int age = calculateAge(rq.getBirthDate());
         int daeUnChangeCnt = calculateDaeunChanges(age, rq.getGender());
-        String daeUn = calculateChangedGanJi(rq.getFourPillars(), rq.getCalenderType(), daeUnChangeCnt);
+        String daeUn = calculateChangedGanJi(rq.getFourPillars(), rq.getCalenderType(), rq.getGender(), daeUnChangeCnt);
 
         LuckPillar luckPillar = luckPillarRepository.findByGanji(daeUn).orElseThrow();
 
@@ -207,14 +207,14 @@ public class ManSeryeokService {
                 luckPillar.getExpression(), luckPillar.getCelebrities());
     }
 
-    private String calculateChangedGanJi(String fourPillars, String calenderType, int daeUnChangeCnt) {
+    private String calculateChangedGanJi(String fourPillars, String calenderType, String gender, int daeUnChangeCnt) {
         if (daeUnChangeCnt == -1) {
             return fourPillars.substring(0, 2);
         }
 
         Ji currentJi = Ji.findByName(String.valueOf(fourPillars.charAt(3)));
         CalendarType calendarType = CalendarType.findByName(calenderType);
-        String changedJi = Ji.changeJi(currentJi, daeUnChangeCnt, calendarType).getCharacter();
+        String changedJi = Ji.changeJi(currentJi, daeUnChangeCnt, calendarType, gender).getCharacter();
         String gan = String.valueOf(fourPillars.charAt(2));
         return gan + changedJi;
     }
