@@ -12,6 +12,6 @@ public interface ManSeryeokRepository extends JpaRepository<ManSeryeok, Long> {
     @Query("SELECT m.solarGanJi FROM ManSeryeok m WHERE m.solarDate = :localDate")
     Optional<String> findSolarGanJiBySolarDate(@Param("localDate") LocalDate localDate);
 
-    @Query("SELECT m.luna.lunarGanJi FROM ManSeryeok m WHERE m.luna.lunarGanJi = :localDate")
+    @Query("SELECT m.luna.lunarGanJi FROM ManSeryeok m WHERE m.luna.lunarDate = :localDate")
     Optional<String> findLunarGanJiByLunarDate(@Param("localDate") LocalDate localDate);
 }

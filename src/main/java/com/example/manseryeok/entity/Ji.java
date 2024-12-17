@@ -38,10 +38,11 @@ public enum Ji {
     }
 
     private static boolean isTimeInRange(LocalTime time, LocalTime start, LocalTime end) {
-        if (start.isAfter(end)) {  // 23:00-01:00 처리
-            return !time.isAfter(end) || !time.isBefore(start);
+        if (start.equals(LocalTime.of(23, 0))) {
+            return time.equals(LocalTime.of(0, 0)) || time.isBefore(LocalTime.of(1, 0))
+                    || !time.isBefore(LocalTime.of(23, 0));
         }
-        return !time.isBefore(start) && !time.isAfter(end);
+        return !time.isBefore(start) && time.isBefore(end);
     }
 
     public static Ji findByName(String name) {
