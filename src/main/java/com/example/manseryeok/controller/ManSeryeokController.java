@@ -35,4 +35,15 @@ public class ManSeryeokController {
         CreateDestinyRs rs = manSeryeokService.calculateFourPillarsDestiny(rq);
         return ResponseEntity.ok(rs);
     }
+
+    @PostMapping("/luckPillars/upload")
+    public ResponseEntity<String> uploadLuckPillarsData(@RequestParam("file") MultipartFile file) {
+        try {
+            manSeryeokService.processLuckPillarsCSVFile(file);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("대운 데이터 업로드 실패: " + e.getMessage());
+        }
+        return ResponseEntity.ok("대운 데이터 업로드 성공");
+    }
 }

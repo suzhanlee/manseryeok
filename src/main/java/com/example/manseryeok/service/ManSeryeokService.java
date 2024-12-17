@@ -104,4 +104,86 @@ public class ManSeryeokService {
             throw new IllegalArgumentException("일간 추출에 실패했습니다: " + e.getMessage());
         }
     }
+
+    public void processLuckPillarsCSVFile(MultipartFile file) throws IOException {
+        try (CSVReader csvReader = new CSVReader(
+                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+            String[] currentRow;
+
+            String currentFirstField = null;
+            StringBuilder secondFieldBuilder = new StringBuilder();
+            StringBuilder thirdFieldBuilder = new StringBuilder();
+            StringBuilder fourthFieldBuilder = new StringBuilder();
+            String fifthField = null;
+            String sixthField = null;
+
+            while ((currentRow = csvReader.readNext()) != null) {
+                if (currentRow[0] != null && !currentRow[0].trim().isEmpty()) {
+                    if (currentFirstField != null) {
+                        saveLuckPillar(
+                                currentFirstField,
+                                secondFieldBuilder.toString().trim(),
+                                thirdFieldBuilder.toString().trim(),
+                                fourthFieldBuilder.toString().trim(),
+                                fifthField,
+                                sixthField
+                        );
+
+                        secondFieldBuilder.setLength(0);
+                        thirdFieldBuilder.setLength(0);
+                        fourthFieldBuilder.setLength(0);
+                    }
+
+                    currentFirstField = currentRow[0].trim();
+                    if (currentRow.length > 1 && currentRow[1].trim().contains("남녀공통특징")) {
+                        if (currentRow.length > 2) {
+                            secondFieldBuilder.append(currentRow[2].trim());
+                        }
+                    }
+                } else {
+                    if (currentRow.length > 1) {
+                        if (currentRow[1].trim().contains("남자특징")) {
+                            if (currentRow.length > 2) {
+                                thirdFieldBuilder.append(currentRow[2].trim());
+                            }
+                        } else if (currentRow[1].trim().contains("여자특징")) {
+                            if (currentRow.length > 2) {
+                                fourthFieldBuilder.append(currentRow[2].trim());
+                            }
+                        } else if (currentRow[1].trim().contains("표현")) {
+                            if (currentRow.length > 2) {
+                                fifthField = currentRow[2].trim();
+                            }
+                        } else if (currentRow[1].trim().contains("유명인")) {
+                            if (currentRow.length > 2) {
+                                sixthField = currentRow[2].trim();
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (currentFirstField != null) {
+                saveLuckPillar(
+                        currentFirstField,
+                        secondFieldBuilder.toString().trim(),
+                        thirdFieldBuilder.toString().trim(),
+                        fourthFieldBuilder.toString().trim(),
+                        fifthField,
+                        sixthField
+                );
+            }
+        } catch (CsvValidationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void saveLuckPillar(String firstField, String secondField, String thirdField,
+                                String fourthField, String fifthField, String sixthField) {
+        if (firstField != null && !firstField.isEmpty()) {
+            LuckPillar luckPillar = LuckPillar.createLuckPillar(
+                    firstField, secondField, thirdField, fourthField, fifthField, sixthField);
+            luckPillarRepository.save(luckPillar);
+        }
+    }
 }
