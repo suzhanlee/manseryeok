@@ -1,4 +1,4 @@
-package com.example.manseryeok.entity;
+package com.example.manseryeok.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

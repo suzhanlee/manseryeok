@@ -1,14 +1,15 @@
 package com.example.manseryeok.service;
 
+import com.example.manseryeok.domain.CsvFileProcessor;
 import com.example.manseryeok.dto.rq.CreateDestinyRq;
 import com.example.manseryeok.dto.rq.CreateLuckPillarsRq;
 import com.example.manseryeok.dto.rs.CreateDestinyRs;
 import com.example.manseryeok.dto.rs.CreateLuckPillarsRs;
-import com.example.manseryeok.entity.CalendarType;
-import com.example.manseryeok.entity.HourPillar;
-import com.example.manseryeok.entity.Ji;
-import com.example.manseryeok.entity.LuckPillar;
-import com.example.manseryeok.entity.ManSeryeok;
+import com.example.manseryeok.domain.CalendarType;
+import com.example.manseryeok.domain.HourPillar;
+import com.example.manseryeok.domain.Ji;
+import com.example.manseryeok.domain.entity.LuckPillar;
+import com.example.manseryeok.domain.entity.ManSeryeok;
 import com.example.manseryeok.repository.LuckPillarRepository;
 import com.example.manseryeok.repository.ManSeryeokRepository;
 import com.opencsv.CSVReader;
@@ -34,6 +35,7 @@ public class ManSeryeokService {
 
     private final ManSeryeokRepository manSeryeokRepository;
     private final LuckPillarRepository luckPillarRepository;
+    private final CsvFileProcessor csvFileProcessor;
 
     public void processManSeryeokCSVFile(MultipartFile file) throws IOException {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
@@ -42,7 +44,8 @@ public class ManSeryeokService {
             int lineNumber = 1;
             while ((line = br.readLine()) != null) {
                 try {
-                    processLine(line, lineNumber);
+                    ManSeryeok manSeryeok = csvFileProcessor.processLine(line, lineNumber);
+                    manSeryeokRepository.save(manSeryeok);
                 } catch (DateTimeException e) {
                     log.warn("{}번째 줄: 유효하지 않은 날짜 형식입니다 - {}", lineNumber, line);
                     continue;
@@ -52,23 +55,6 @@ public class ManSeryeokService {
                 }
                 lineNumber++;
             }
-        }
-    }
-
-    private void processLine(String line, int lineNumber) {
-        String[] data = line.split(",");
-        try {
-            ManSeryeok manSeryeok = ManSeryeok.createCalendar(
-                    data[0],
-                    LocalDate.parse(data[1]),
-                    data[2],
-                    data[3],
-                    LocalDate.parse(data[4]),
-                    data[5]
-            );
-            manSeryeokRepository.save(manSeryeok);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new IllegalArgumentException(lineNumber + "번째 줄: 데이터 형식이 올바르지 않습니다");
         }
     }
 

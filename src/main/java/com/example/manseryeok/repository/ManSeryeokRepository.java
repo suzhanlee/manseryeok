@@ -1,6 +1,6 @@
 package com.example.manseryeok.repository;
 
-import com.example.manseryeok.entity.ManSeryeok;
+import com.example.manseryeok.domain.entity.ManSeryeok;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,6 @@
 package com.example.manseryeok.repository;
 
-import com.example.manseryeok.entity.LuckPillar;
+import com.example.manseryeok.domain.entity.LuckPillar;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

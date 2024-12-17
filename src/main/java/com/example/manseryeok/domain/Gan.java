@@ -1,4 +1,4 @@
-package com.example.manseryeok.entity;
+package com.example.manseryeok.domain;
 
 import java.util.Arrays;
 import lombok.Getter;
