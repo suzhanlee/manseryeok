@@ -1,7 +1,6 @@
 package com.example.manseryeok.entity;
 
 import java.time.LocalTime;
-import java.util.Optional;
 
 public class HourPillar {
 

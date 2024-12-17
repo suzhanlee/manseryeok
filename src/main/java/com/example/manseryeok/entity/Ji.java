@@ -43,4 +43,30 @@ public enum Ji {
         }
         return !time.isBefore(start) && !time.isAfter(end);
     }
+
+    public static Ji findByName(String name) {
+        return Arrays.stream(values())
+                .filter(j -> j.character.equals(name))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    public static Ji changeJi(Ji startJi, int count, CalendarType calendarType) {
+        if (count == 0) {
+            return startJi;
+        }
+        boolean isForward = CalendarType.SOLAR.equals(calendarType);
+        return startJi.getNextJi(count, isForward);
+    }
+
+    private Ji getNextJi(int count, boolean isForward) {
+        Ji[] values = Ji.values();
+        int currentIndex = this.ordinal();
+
+        if (isForward) {
+            return values[(currentIndex + count) % values.length];
+        } else {
+            return values[(currentIndex - count + values.length * Math.abs(count / values.length)) % values.length];
+        }
+    }
 }

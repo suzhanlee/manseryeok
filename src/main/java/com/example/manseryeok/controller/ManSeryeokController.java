@@ -1,7 +1,9 @@
 package com.example.manseryeok.controller;
 
 import com.example.manseryeok.dto.rq.CreateDestinyRq;
+import com.example.manseryeok.dto.rq.CreateLuckPillarsRq;
 import com.example.manseryeok.dto.rs.CreateDestinyRs;
+import com.example.manseryeok.dto.rs.CreateLuckPillarsRs;
 import com.example.manseryeok.service.ManSeryeokService;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -45,5 +47,11 @@ public class ManSeryeokController {
                     .body("대운 데이터 업로드 실패: " + e.getMessage());
         }
         return ResponseEntity.ok("대운 데이터 업로드 성공");
+    }
+
+    @PostMapping("/luckPillars")
+    public ResponseEntity<CreateLuckPillarsRs> createLuckPillars(@RequestBody CreateLuckPillarsRq rq) {
+        CreateLuckPillarsRs rs = manSeryeokService.calculateLuckPillars(rq);
+        return ResponseEntity.ok(rs);
     }
 }

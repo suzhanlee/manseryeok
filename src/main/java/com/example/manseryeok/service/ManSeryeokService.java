@@ -1,9 +1,12 @@
 package com.example.manseryeok.service;
 
 import com.example.manseryeok.dto.rq.CreateDestinyRq;
+import com.example.manseryeok.dto.rq.CreateLuckPillarsRq;
 import com.example.manseryeok.dto.rs.CreateDestinyRs;
+import com.example.manseryeok.dto.rs.CreateLuckPillarsRs;
 import com.example.manseryeok.entity.CalendarType;
 import com.example.manseryeok.entity.HourPillar;
+import com.example.manseryeok.entity.Ji;
 import com.example.manseryeok.entity.LuckPillar;
 import com.example.manseryeok.entity.ManSeryeok;
 import com.example.manseryeok.repository.LuckPillarRepository;
@@ -16,6 +19,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.Period;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -185,5 +189,49 @@ public class ManSeryeokService {
                     firstField, secondField, thirdField, fourthField, fifthField, sixthField);
             luckPillarRepository.save(luckPillar);
         }
+    }
+
+    public CreateLuckPillarsRs calculateLuckPillars(CreateLuckPillarsRq rq) {
+        int age = calculateAge(rq.getBirthDate());
+        int daeUnChangeCnt = calculateDaeunChanges(age, rq.getGender());
+        String daeUn = calculateChangedGanJi(rq.getFourPillars(), rq.getCalenderType(), daeUnChangeCnt);
+
+        LuckPillar luckPillar = luckPillarRepository.findByGanji(daeUn).orElseThrow();
+
+        if ("man".equals(rq.getGender())) {
+            return new CreateLuckPillarsRs(daeUn, luckPillar.getCommonAdvice(), luckPillar.getManAdvice(),
+                    luckPillar.getExpression(), luckPillar.getCelebrities());
+        }
+
+        return new CreateLuckPillarsRs(daeUn, luckPillar.getCommonAdvice(), luckPillar.getGirlAdvice(),
+                luckPillar.getExpression(), luckPillar.getCelebrities());
+    }
+
+    private String calculateChangedGanJi(String fourPillars, String calenderType, int daeUnChangeCnt) {
+        if (daeUnChangeCnt == -1) {
+            return fourPillars.substring(0, 2);
+        }
+
+        Ji currentJi = Ji.findByName(String.valueOf(fourPillars.charAt(3)));
+        CalendarType calendarType = CalendarType.findByName(calenderType);
+        String changedJi = Ji.changeJi(currentJi, daeUnChangeCnt, calendarType).getCharacter();
+        String gan = String.valueOf(fourPillars.charAt(2));
+        return gan + changedJi;
+    }
+
+    private int calculateAge(LocalDate birthDate) {
+        return Period.between(birthDate, LocalDate.now()).getYears();
+    }
+
+    private int calculateDaeunChanges(int age, String gender) {
+        int adjustedAge = "man".equals(gender) ? age - 3 : age - 4;
+
+        if (adjustedAge < 0) {
+            return -1;
+        } else if (adjustedAge == 0) {
+            return 0;
+        }
+
+        return adjustedAge / 10;
     }
 }
