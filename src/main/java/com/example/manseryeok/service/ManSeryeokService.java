@@ -1,15 +1,17 @@
 package com.example.manseryeok.service;
 
+import com.example.manseryeok.domain.CalendarType;
 import com.example.manseryeok.domain.CsvFileProcessor;
+import com.example.manseryeok.domain.HourPillar;
+import com.example.manseryeok.domain.Ji;
+import com.example.manseryeok.domain.LuckPillarProcessor;
+import com.example.manseryeok.domain.entity.LuckPillar;
+import com.example.manseryeok.domain.entity.ManSeryeok;
+import com.example.manseryeok.dto.LuckPillarDto;
 import com.example.manseryeok.dto.rq.CreateDestinyRq;
 import com.example.manseryeok.dto.rq.CreateLuckPillarsRq;
 import com.example.manseryeok.dto.rs.CreateDestinyRs;
 import com.example.manseryeok.dto.rs.CreateLuckPillarsRs;
-import com.example.manseryeok.domain.CalendarType;
-import com.example.manseryeok.domain.HourPillar;
-import com.example.manseryeok.domain.Ji;
-import com.example.manseryeok.domain.entity.LuckPillar;
-import com.example.manseryeok.domain.entity.ManSeryeok;
 import com.example.manseryeok.repository.LuckPillarRepository;
 import com.example.manseryeok.repository.ManSeryeokRepository;
 import com.opencsv.CSVReader;
@@ -36,6 +38,7 @@ public class ManSeryeokService {
     private final ManSeryeokRepository manSeryeokRepository;
     private final LuckPillarRepository luckPillarRepository;
     private final CsvFileProcessor csvFileProcessor;
+    private final LuckPillarProcessor luckPillarProcessor;
 
     public void processManSeryeokCSVFile(MultipartFile file) throws IOException {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
@@ -100,81 +103,23 @@ public class ManSeryeokService {
                 new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             String[] currentRow;
 
-            String currentFirstField = null;
-            StringBuilder secondFieldBuilder = new StringBuilder();
-            StringBuilder thirdFieldBuilder = new StringBuilder();
-            StringBuilder fourthFieldBuilder = new StringBuilder();
-            String fifthField = null;
-            String sixthField = null;
-
             while ((currentRow = csvReader.readNext()) != null) {
-                if (currentRow[0] != null && !currentRow[0].trim().isEmpty()) {
-                    if (currentFirstField != null) {
-                        saveLuckPillar(
-                                currentFirstField,
-                                secondFieldBuilder.toString().trim(),
-                                thirdFieldBuilder.toString().trim(),
-                                fourthFieldBuilder.toString().trim(),
-                                fifthField,
-                                sixthField
-                        );
-
-                        secondFieldBuilder.setLength(0);
-                        thirdFieldBuilder.setLength(0);
-                        fourthFieldBuilder.setLength(0);
-                    }
-
-                    currentFirstField = currentRow[0].trim();
-                    if (currentRow.length > 1 && currentRow[1].trim().contains("남녀공통특징")) {
-                        if (currentRow.length > 2) {
-                            secondFieldBuilder.append(currentRow[2].trim());
-                        }
-                    }
-                } else {
-                    if (currentRow.length > 1) {
-                        if (currentRow[1].trim().contains("남자특징")) {
-                            if (currentRow.length > 2) {
-                                thirdFieldBuilder.append(currentRow[2].trim());
-                            }
-                        } else if (currentRow[1].trim().contains("여자특징")) {
-                            if (currentRow.length > 2) {
-                                fourthFieldBuilder.append(currentRow[2].trim());
-                            }
-                        } else if (currentRow[1].trim().contains("표현")) {
-                            if (currentRow.length > 2) {
-                                fifthField = currentRow[2].trim();
-                            }
-                        } else if (currentRow[1].trim().contains("유명인")) {
-                            if (currentRow.length > 2) {
-                                sixthField = currentRow[2].trim();
-                            }
-                        }
-                    }
+                LuckPillarDto luckPillarDto = luckPillarProcessor.process(currentRow);
+                if (luckPillarDto.isComplete()) {
+                    luckPillarRepository.save(luckPillarDto.getLuckPillar());
                 }
             }
 
-            if (currentFirstField != null) {
-                saveLuckPillar(
-                        currentFirstField,
-                        secondFieldBuilder.toString().trim(),
-                        thirdFieldBuilder.toString().trim(),
-                        fourthFieldBuilder.toString().trim(),
-                        fifthField,
-                        sixthField
-                );
-            }
+            saveLastLuckPillar();
+
         } catch (CsvValidationException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void saveLuckPillar(String firstField, String secondField, String thirdField,
-                                String fourthField, String fifthField, String sixthField) {
-        if (firstField != null && !firstField.isEmpty()) {
-            LuckPillar luckPillar = LuckPillar.createLuckPillar(
-                    firstField, secondField, thirdField, fourthField, fifthField, sixthField);
-            luckPillarRepository.save(luckPillar);
-        }
+    private void saveLastLuckPillar() {
+        LuckPillar lastLuckPillar = luckPillarProcessor.createLuckPillar();
+        luckPillarRepository.save(lastLuckPillar);
     }
 
     public CreateLuckPillarsRs calculateLuckPillars(CreateLuckPillarsRq rq) {
