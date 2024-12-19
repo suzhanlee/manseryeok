@@ -127,18 +127,7 @@ public class ManSeryeokService {
     }
 
     public CreateLuckPillarsRs calculateLuckPillars(CreateLuckPillarsRq rq) {
-        LocalDate birthDate = rq.getBirthDate();
-        LocalTime birthTime = rq.getBirthTime();
-        LocalDateTime birthDateTime = LocalDateTime.of(birthDate.getYear(), birthDate.getMonthValue(),
-                birthDate.getDayOfMonth(),
-                birthTime.getHour(), birthTime.getMinute());
-        CalendarType calendarType = CalendarType.findByName(rq.getCalendarType());
-        Term nearestSolarTerm = Term.findNearestSolarTerm(
-                birthDateTime, calendarType);
-
-        LocalDateTime solarTermDateTime = nearestSolarTerm.createDateTime(birthDateTime.getYear());
-        double daysDifference = ChronoUnit.MINUTES.between(birthDateTime, solarTermDateTime) / (24.0 * 60);
-        int daeUnChangeCnt = (int) Math.round(daysDifference / 3);
+        int daeUnChangeCnt = findDaeUnCnt(rq);
 
         String gender = rq.getGender();
         String fourPillars = rq.getFourPillars();
@@ -151,6 +140,22 @@ public class ManSeryeokService {
         String daeUn = calculateDaeUnByDirection(ganJi, daeUnChangeCnt, direction);
         LuckPillar luckPillar = luckPillarRepository.findByGanji(daeUn).orElseThrow();
         return createLuckPillarsRsByGender(gender, daeUn, luckPillar);
+    }
+
+    private int findDaeUnCnt(CreateLuckPillarsRq rq) {
+        LocalDate birthDate = rq.getBirthDate();
+        LocalTime birthTime = rq.getBirthTime();
+        CalendarType calendarType = CalendarType.findByName(rq.getCalendarType());
+
+        LocalDateTime birthDateTime = LocalDateTime.of(birthDate.getYear(), birthDate.getMonthValue(),
+                birthDate.getDayOfMonth(),
+                birthTime.getHour(), birthTime.getMinute());
+        Term nearestSolarTerm = Term.findNearestSolarTerm(
+                birthDateTime, calendarType);
+
+        LocalDateTime solarTermDateTime = nearestSolarTerm.createDateTime(birthDateTime.getYear());
+        double daysDifference = ChronoUnit.MINUTES.between(birthDateTime, solarTermDateTime) / (24.0 * 60);
+        return (int) Math.round(daysDifference / 3);
     }
 
     private String calculateDaeUnByDirection(GanJi ganJi, int daeUnChangeCnt, int direction) {
