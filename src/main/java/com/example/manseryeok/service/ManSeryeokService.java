@@ -143,19 +143,26 @@ public class ManSeryeokService {
     }
 
     private int findDaeUnCnt(CreateLuckPillarsRq rq) {
-        LocalDate birthDate = rq.getBirthDate();
-        LocalTime birthTime = rq.getBirthTime();
         CalendarType calendarType = CalendarType.findByName(rq.getCalendarType());
-
-        LocalDateTime birthDateTime = LocalDateTime.of(birthDate.getYear(), birthDate.getMonthValue(),
-                birthDate.getDayOfMonth(),
-                birthTime.getHour(), birthTime.getMinute());
+        LocalDateTime birthDateTime = getBirthDateTime(rq);
         Term nearestSolarTerm = Term.findNearestSolarTerm(
                 birthDateTime, calendarType);
 
         LocalDateTime solarTermDateTime = nearestSolarTerm.createDateTime(birthDateTime.getYear());
         double daysDifference = ChronoUnit.MINUTES.between(birthDateTime, solarTermDateTime) / (24.0 * 60);
         return (int) Math.round(daysDifference / 3);
+    }
+
+    private static LocalDateTime getBirthDateTime(CreateLuckPillarsRq rq) {
+        LocalDate birthDate = rq.getBirthDate();
+        if (rq.getBirthTime() != null) {
+            LocalTime birthTime = rq.getBirthTime();
+            return LocalDateTime.of(birthDate.getYear(), birthDate.getMonthValue(),
+                    birthDate.getDayOfMonth(),
+                    birthTime.getHour(), birthTime.getMinute());
+        }
+        return LocalDateTime.of(birthDate.getYear(), birthDate.getMonthValue(),
+                birthDate.getDayOfMonth(), 0, 0);
     }
 
     private String calculateDaeUnByDirection(GanJi ganJi, int daeUnChangeCnt, int direction) {
