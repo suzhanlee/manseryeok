@@ -30,8 +30,9 @@ public enum Gan {
                 .orElseThrow()
                 .ordinal();
 
-        int baseGan = (dayGanIndex / 2) * 2;
-        int hourGanIndex = (baseGan + jiIndex / 2) % 10;
+//        int baseGan = (dayGanIndex / 2) * 2;
+//        int hourGanIndex = (baseGan + jiIndex / 2) % 10;
+        int hourGanIndex = (dayGanIndex + (jiIndex + 1) / 2) % 10;
         return values()[hourGanIndex];
     }
 }

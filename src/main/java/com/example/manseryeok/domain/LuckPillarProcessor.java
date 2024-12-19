@@ -28,23 +28,16 @@ public class LuckPillarProcessor {
             initNextLuckPillar(currentRow);
 
         } else {
-            if (currentRow.length > 1) {
-                if (currentRow[1].trim().contains("남자특징")) {
-                    if (currentRow.length > 2) {
-                        thirdFieldBuilder.append(currentRow[2].trim());
-                    }
-                } else if (currentRow[1].trim().contains("여자특징")) {
-                    if (currentRow.length > 2) {
-                        fourthFieldBuilder.append(currentRow[2].trim());
-                    }
-                } else if (currentRow[1].trim().contains("표현")) {
-                    if (currentRow.length > 2) {
-                        fifthField = currentRow[2].trim();
-                    }
-                } else if (currentRow[1].trim().contains("유명인")) {
-                    if (currentRow.length > 2) {
-                        sixthField = currentRow[2].trim();
-                    }
+            if (currentRow.length > 2) {
+                String content = currentRow[1].trim();
+                if (content.contains("남자특징")) {
+                    thirdFieldBuilder.append(currentRow[2].trim());
+                } else if (content.contains("여자특징")) {
+                    fourthFieldBuilder.append(currentRow[2].trim());
+                } else if (content.contains("표현")) {
+                    fifthField = currentRow[2].trim();
+                } else if (content.contains("유명인")) {
+                    sixthField = currentRow[2].trim();
                 }
             }
         }
@@ -57,7 +50,6 @@ public class LuckPillarProcessor {
                 secondFieldBuilder.append(currentRow[2].trim());
             }
         }
-
         currentFirstField = currentRow[0].trim();
     }
 
