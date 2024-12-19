@@ -1,6 +1,7 @@
 package com.example.manseryeok.dto.rq;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,6 @@ public class CreateLuckPillarsRq {
 
     private String fourPillars;
     private String gender;
-    private LocalDate birthDate;
+    private LocalDateTime birthDateTime;
     private String calendarType;
 }

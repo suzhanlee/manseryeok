@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -125,13 +125,15 @@ public class ManSeryeokService {
     }
 
     public CreateLuckPillarsRs calculateLuckPillars(CreateLuckPillarsRq rq) {
-        LocalDate birthDate = rq.getBirthDate();
+        LocalDateTime birthDateTime = rq.getBirthDateTime();
         CalendarType calendarType = CalendarType.findByName(rq.getCalendarType());
-        Term nearestSolarTerm = Term.findNearestSolarTerm(birthDate, calendarType);
+        Term nearestSolarTerm = Term.findNearestSolarTerm(birthDateTime, calendarType);
 
-        long daysDifference = ChronoUnit.DAYS.between(birthDate, nearestSolarTerm.createDate(birthDate.getYear()));
+        LocalDateTime solarTermDateTime = nearestSolarTerm.createDateTime(birthDateTime.getYear());
 
-        int daeUnChangeCnt = Math.round(daysDifference / 3f);
+        double daysDifference = ChronoUnit.MINUTES.between(birthDateTime, solarTermDateTime) / (24.0 * 60);
+
+        int daeUnChangeCnt = (int) Math.round(daysDifference / 3);
 
         String gender = rq.getGender();
         String fourPillars = rq.getFourPillars();
