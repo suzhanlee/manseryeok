@@ -90,7 +90,7 @@ public class ManSeryeokService {
         try {
             String[] parts = ganji.split("[年月日 ]");
             if (parts.length >= 3) {
-                return parts[2].substring(0, 1);
+                return parts[4].substring(0, 1);
             }
             throw new IllegalArgumentException("사주 형식이 올바르지 않습니다");
         } catch (Exception e) {
