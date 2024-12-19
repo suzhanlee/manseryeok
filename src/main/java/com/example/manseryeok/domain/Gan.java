@@ -69,16 +69,42 @@ public enum Gan {
                 "壬", "癸", "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"
         ));
 
-        Gan gan = Arrays.stream(values())
-                .filter(g -> g.character.equals(dayGan))
+        Gan findDayGan = findByName(dayGan);
+
+        int jiIndex = ji.ordinal();
+        String findGan = hourGanTable.get(findDayGan.character).get(jiIndex);
+        return findByName(findGan);
+    }
+
+    public static Gan findByName(String gan) {
+        return Arrays.stream(values())
+                .filter(g -> g.character.equals(gan))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    public static int determineDirection(String gender, String yearGan) {
+        Map<Gan, Integer> yearGanTable = new HashMap<>();
+
+        yearGanTable.put(GAPS, 1);
+        yearGanTable.put(EUL, -1);
+        yearGanTable.put(BYUNG, 1);
+        yearGanTable.put(JUNG, -1);
+        yearGanTable.put(MU, 1);
+        yearGanTable.put(GI, -1);
+        yearGanTable.put(GYUNG, 1);
+        yearGanTable.put(SHIN, -1);
+        yearGanTable.put(IM, 1);
+        yearGanTable.put(GYE, -1);
+
+        Gan findYearGan = Arrays.stream(values())
+                .filter(g -> g.character.equals(yearGan))
                 .findFirst()
                 .orElseThrow();
 
-        int jiIndex = ji.ordinal();
-        String findGan = hourGanTable.get(gan.character).get(jiIndex);
-        return Arrays.stream(values())
-                .filter(g -> g.character.equals(findGan))
-                .findFirst()
-                .orElseThrow();
+        if ("man".equals(gender)) {
+            return yearGanTable.get(findYearGan);
+        }
+        return -yearGanTable.get(findYearGan);
     }
 }
